@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- Set language options for Windows Install-->
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UILanguageFallback>en-US</UILanguageFallback>
+            <UserLocale>en-US</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <DiskConfiguration>
+            	<WillShowUI>OnError</WillShowUI>
+                <!-- Setup disk partitions for UEFI boot-->
+                <!-- See this article: https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-8.1-and-8/hh824839(v=win.10)-->
+            	<Disk>
+            		<DiskID>0</DiskID>
+            		<WillWipeDisk>true</WillWipeDisk>
+            		<CreatePartitions>
+            			<!-- Create the EFI partition -->
+            			<CreatePartition>
+            				<Order>1</Order>
+            				<Type>EFI</Type>
+            				<Size>500</Size>
+            			</CreatePartition>
+            			<!-- Create the Recovery partition -->
+            			<CreatePartition>
+            				<Order>2</Order>
+            				<Type>Primary</Type>
+            				<Size>200</Size>
+            			</CreatePartition>
+            			<!-- Create the MSR partition -->
+            			<CreatePartition>
+            			    <Order>3</Order>
+            			    <Type>MSR</Type>
+            			    <Size>128</Size>
+            		    </CreatePartition>
+            	    	<!-- Create the Windows partition and fill the rest of the hard disk -->
+            	    	<CreatePartition>
+            	    		<Order>4</Order>
+            	    		<Type>Primary</Type>
+            	    		<Extend>true</Extend>
+            	    	</CreatePartition>
+                	</CreatePartitions>
+                	<ModifyPartitions>
+            	    	<!-- Format the system partition -->
+            		    <ModifyPartition>
+            			    <Order>1</Order>
+            			    <PartitionID>1</PartitionID>
+            			    <Format>FAT32</Format>
+            			    <Label>System</Label>
+            		    </ModifyPartition>
+            		    <!-- Format the recovery partition -->
+            		    <ModifyPartition>
+            		    	<Order>2</Order>
+            		    	<PartitionID>2</PartitionID>
+            	    		<Format>NTFS</Format>
+            	    		<Label>Recovery</Label>
+            		    	<TypeID>de94bba4-06d1-4d40-a16a-bfd50179d6ac</TypeID>
+            	    	</ModifyPartition>
+            	    	<!-- The MSR partition does not need to be modified. Add a modify tags for clarity -->
+                        <ModifyPartition>
+                            <Order>3</Order>
+                            <PartitionID>3</PartitionID>
+                        </ModifyPartition>
+            	    	<!-- Format the Windows partition -->
+            	    	<ModifyPartition>
+            	    		<Order>4</Order>
+            	    		<PartitionID>4</PartitionID>
+            		    	<Format>NTFS</Format>
+            	    		<Label>Windows</Label>
+            	    	</ModifyPartition>
+                	</ModifyPartitions>
+                </Disk>
+            </DiskConfiguration>
+            <ImageInstall>
+                <OSImage>
+                    <InstallFrom>
+                        <!-- Choose what version to install from ISO -->
+                        <!-- How to see what versions are available on your ISO: https://woshub.com/find-windows-version-edition-build-iso-wim-file/ -->
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/NAME</Key>
+                            <Value>Windows 10 Pro</Value>
+                        </MetaData>
+                    </InstallFrom>
+                    <!-- Choosing the disk and partition label to install windows to -->
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>4</PartitionID>
+                    </InstallTo>
+                </OSImage>
+            </ImageInstall>
+            <UserData>
+                <ProductKey>
+                    <!-- Set your product key here. This is a generic Windows 10 Pro Key-->
+                    <key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</key>
+                    <WillShowUI>OnError</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+                <!-- These settings are used to decide the machine name prefix when sysprep_unattend.xml is ran-->
+                <FullName>Vagrant</FullName>
+                <Organization>Vagrant</Organization>
+            </UserData>
+        </component>
+    </settings>
+    <settings pass="generalize">
+        <component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <!-- This Auotunattend.xml is for installing windows. We don't need to reset licensing -->
+            <SkipRearm>1</SkipRearm>
+        </component>
+        <component name="Microsoft-Windows-PnpSysprep" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <!-- We do not want plug n play devices to be generalized -->
+            <PersistAllDeviceInstalls>false</PersistAllDeviceInstalls>
+            <DoNotCleanUpNonPresentDevices>false</DoNotCleanUpNonPresentDevices>
+        </component>
+    </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <!-- Set language options for OOBE -->
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <OOBE>
+                <!-- Skip all OOBE steps -->
+                <HideEULAPage>true</HideEULAPage>
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <NetworkLocation>Work</NetworkLocation>
+                <ProtectYourPC>3</ProtectYourPC>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+            </OOBE>
+            <TimeZone>UTC</TimeZone>
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>vagrant</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+                <LocalAccounts>
+                    <!-- Create local admin account -->
+                    <LocalAccount wcm:action="add">
+                        <Password>
+                            <Value>vagrant</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                        <Description>Vagrant User</Description>
+                        <DisplayName>vagrant</DisplayName>
+                        <Group>administrators</Group>
+                        <Name>vagrant</Name>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+            <AutoLogon>
+                <!-- Automatically login as vagrant user-->
+                <Password>
+                    <Value>vagrant</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Username>vagrant</Username>
+                <Enabled>true</Enabled>
+            </AutoLogon>
+            <FirstLogonCommands>
+            <!-- All of these commands run after vagrant logs in for the first time -->
+                <SynchronousCommand wcm:action="add">
+                    <!-- Allow powershell scripts to run -->
+                    <CommandLine>cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
+                    <Description>Set Execution Policy 64 Bit</Description>
+                    <Order>1</Order>
+                    <!-- This shows the CMD window which can be helpful for debugging -->
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <!-- Allow powershell scripts to run -->
+                    <CommandLine>C:\Windows\SysWOW64\cmd.exe /c powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
+                    <Description>Set Execution Policy 32 Bit</Description>
+                    <Order>2</Order>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <!-- Configure WinRM so packer can do things -->
+                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File e:\scripts\bootstrap.ps1</CommandLine>
+                    <Description>Configure WinRM so packer can connect</Description>
+                    <Order>3</Order>
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <!-- Set vagrant password to never expire. Otherwise your vagrant box may require a password change -->
+                    <CommandLine>cmd.exe /c wmic useraccount where "name='vagrant'" set PasswordExpires=FALSE</CommandLine>
+                    <Order>4</Order>
+                    <Description>Disable password expiration for vagrant user</Description>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+        </component>
+    </settings>
+</unattend>

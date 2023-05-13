@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+    # Install a local box with vagrant box add --name packertest ./Path/to/box
+    config.vm.box = "packertest"
+    # Using WinRM to communicate. WinRM is already configured by packer
+    config.vm.communicator = "winrm"
+    config.winrm.username = "vagrant"
+    config.winrm.password = "vagrant"
+    config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+    config.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
+    config.vm.guest = :windows
+    config.windows.halt_timeout = 15
+    
+    # Tells vagrant how to use virtualbox
+    config.vm.provider "virtualbox" do |vb|
+        # Display the VirtualBox GUI when booting the machine
+        vb.gui = true
+        
+        # Customize the amount of memory on the VM:
+        vb.memory = "4094"
+        vb.cpus = "4"
+        
+        # Enable secure boot and TPM
+        vb.customize ["modifyvm", :id, "--tpm-type", "2.0"]
+    end
+end

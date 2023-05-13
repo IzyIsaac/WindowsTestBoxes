@@ -1,0 +1,1 @@
+Collection of packer + vagrant templates and helpful scripts to assist with quickly spinning up Windows boxes in VirtualBox

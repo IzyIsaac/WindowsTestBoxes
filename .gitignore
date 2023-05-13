@@ -1,2 +1,5 @@
-/output-*/**
-/packer-cache/**
+output-*/
+packer_cache/
+.vagrant/
+buildlog.log
+*.box
