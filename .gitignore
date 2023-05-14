@@ -3,3 +3,4 @@ packer_cache/
 .vagrant/
 buildlog.log
 *.box
+export/

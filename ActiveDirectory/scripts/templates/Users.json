@@ -1,0 +1,16 @@
+{
+    "Users": [
+        {
+            "Name": "John Doe",
+            "SamAccountName": "jdoe",
+            "Password": "P@ssw0rd!",
+            "Department": "IT"
+        },
+        {
+            "Name": "Jane Doe",
+            "SamAccountName": "jane",
+            "Password": "P@ssw0rd!",
+            "Department": "Sales"
+        }
+    ]
+}

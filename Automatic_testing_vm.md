@@ -1,24 +1,48 @@
-# Quickly create Windows 10 VMs for testing
+# TestBoxes
 
-## Install VirtualBox
-1. https://www.virtualbox.org/wiki/Downloads
+A collection of Packer templates and Vagrant environments for testing/learning/development. Virtual machines are a great way to test things without breaking your actual computers or ruining your customer environments. 
 
-## Download a Windows ISO
-Download a Windows 10 ISO with the [Windows Media Creation Tool](https://www.microsoft.com/en-us/software-download/windows10)
+I would always keep a couple Windows 10 VMs available on all my computers to quickly test things out, and then rollback to a fresh snapshot after I was done. This began to get frustrating when testing certain things, such as Intune/Autopilot. Simply rolling back a snapshot is sometimes not an option, and a whole new VM needs to be created. I wanted to be able to do this with less friction, and be able to replicate it on ANY of my computers without tons of manual configuration. Simply clone the repo, build the box with packer if required, and spin it up with vagrant 
+## What do I use this for?
+* Quickly spin up a Windows 10 VM to test Intune/Autopilot
 
-All testing was done with Windows 10 Pro, because that is what I use in production. Enterprise should also work. Home will probably require changes, but I have no idea why you would need a bunch of windows 10 home test boxes
+* Create an Active Directory lab for learning/testing automation
 
-## Download Packer
-Install with chocolatey. This adds it your path automatically, but uses a community managed chocolatey package
-```powershell
-choco install packer
-```
+* Quickly spin up a Kali Linux box for HTB/TryHackMe
 
-If you want to install straight from Hashicorp, [you can download a binary here](https://developer.hashicorp.com/packer/downloads)
+Every file has comments to explain what is going on to hopefully make this easier to copy/customize to fit other use cases
 
-[Then you need to add packer to your PATH](https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows)
+This project assumes your host is a Windows 10 machine, but it should work on other platforms since virtualbox is used as the provider
+
+## Prerequisites
+* [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
 
+* Hashicorp Packer 
+    Install with chocolatey. This adds it your path automatically, but uses a community managed chocolatey package
+    ```powershell
+    choco install packer
+    ```
+    If you want to install Packer straight from Hashicorp, [you can download a binary here](https://developer.hashicorp.com/packer/downloads). Make sure to add it to your path
+
+* Install [Vagrant](https://developer.hashicorp.com/vagrant/downloads)
+
+* Install an ISO creation tool that packer can use: xorriso, mkisofs, hdiutil, oscdimg. oscdimg is included in the [Windows ADK](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install). Just install "Deployment Tools" during setup, and add C:\Program Files (x86)\Windows Kits\10\Assessment and Deployment Kit\Deployment Tools\amd64\Oscdimg to your PATH
+
+## Project structure
+Each top level folder contains everything required to spin up a vagrant environment
+
+### Window10
+Basic Windows 10 Pro box
+* Chocolatey
+* Chrome
+* 7zip
+* VBox guest additions
+* Windows updated during packer build
+* TPM + Secure Boot enabled
+How to use this box:
+1. Ensure you have a Windows 10 ISO downloaded from the [Windows Media Creation Tool](https://www.microsoft.com/en-us/software-download/windows10)
+2. Edit build.ps1
 ## Create custom answer files
 The main mechanism for automating a Windows install is by using an answer file called "Autounattend.xml". When the Windows install begins, it searches for Autounattend.xml in the installation ISO, as well as any removeable media connected to the computer. If it finds an Autounattend.xml, it using the settings defined within to automatically complete the installation. 
 
@@ -37,4 +61,4 @@ If you want to run some additional scripts during the image build, simply drop y
 
 All scripts are also packaged into an ISO and mounted to the VM along with the unattend files so they can easily be manually ran while debugging a build
 
-##
+## 

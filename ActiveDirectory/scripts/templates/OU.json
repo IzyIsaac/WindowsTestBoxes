@@ -1,0 +1,37 @@
+{
+    "OUs": [
+        {
+            "Name": "Servers"
+        },
+        {
+            "Name": "Workstations",
+            "ChildOUs": [
+                {
+                    "Name": "IT"
+                }
+            ]
+        },
+        {
+            "Name": "Users",
+            "ChildOUs": [
+                {
+                    "Name": "IT",
+                    "ChildOUs": [
+                        {
+                           "Name": "IT Admins"
+                        },
+                        {
+                            "Name": "IT Support"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Sales"
+                }
+            ]
+        },
+        {
+            "Name": "Groups"
+        }
+    ]
+}
