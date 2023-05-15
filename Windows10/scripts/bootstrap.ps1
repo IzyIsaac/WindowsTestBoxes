@@ -16,3 +16,15 @@ Enable-PSRemoting -Force
 # credentials are sent in the clear. Once WinRM is connected, it uses an
 # encrypted tunnel for all communication
 cmd.exe /c winrm set "winrm/config/service" '@{AllowUnencrypted="true"}'
+
+# Configure SSH
+Get-WindowsCapability -Online | Where-Object Name -like ‘OpenSSH.Server*’ | Add-WindowsCapability –Online
+Set-Service -Name sshd -StartupType 'Automatic'
+Start-Service sshd
+
+# Download vagrant default insecure ssh key so box works with vagrant
+$user = "vagrant"
+$public_key_url = "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant.pub"
+$public_key = Invoke-WebRequest -Uri $public_key_url | Select-Object -ExpandProperty Content
+
+Add-Content -Path "C:\Users\$user\.ssh\authorized_keys" -Value $public_key

@@ -9,7 +9,7 @@ $env:PACKER_LOG=1
 $env:PACKER_LOG_PATH="./buildlog.log"
 
 # Generate SHA256 hash of provided ISO path
-$iso_checksum = Get-FileHash $iso_path
+$iso_checksum = (Get-FileHash $iso_path).Hash
 
 # Start the build. 
 # -force deletes artifacts from previous builds

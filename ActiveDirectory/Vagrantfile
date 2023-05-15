@@ -19,10 +19,9 @@ Vagrant.configure("2") do |config|
         # Using a base box from: https://github.com/gusztavvargadr/packer/
         dc.vm.box = "gusztavvargadr/windows-server"
 
-        # Make WinRM use basic auth. After forest is installed and server is rebooted, NTLM auth will break
-        dc.winrm.transport = :plaintext
-        dc.vm.communicator = "winrm"
-        dc.winrm.basic_auth_only = true
+        # Use SSH instead of WinRM
+        dc.vm.communicator = "winssh"
+        dc.ssh.extra_args = ["-tt"]
 
         # Setup networking
         dc.vm.network "private_network", ip: dc_ip
@@ -45,8 +44,11 @@ Vagrant.configure("2") do |config|
             reboot = true
         end
 
+        # After promotion, vagrant becomes a domain user. Tell vagrant to change the username for ssh
+        dc.ssh.username = 'vagrant\vagrant'
+
         # Create OU structure from json template
-        dc.vm.provision "create_ous", type: "shell" do |ps|
+        dc.vm.provision "create_ous", after: "promote", type: "shell" do |ps|
             ps.path = "./scripts/CreateOUs.ps1"
             ps.args = [domain_fqdn, "C:/vagrant/scripts/templates/OU.json"]
         end
@@ -54,13 +56,13 @@ Vagrant.configure("2") do |config|
         # Create users from json template
         dc.vm.provision "create_users", type: "shell" do |ps|
             ps.path = "./scripts/CreateUsers.ps1"
-            ps.args = [domain_fqdn, "C:/vagrant/scripts/templates/Users.json"]
+            ps.args = [domain_fqdn, "C:/vagrant/scripts/templates/Users.json", ]
         end
 
     end
 
     # This section builds a Windows 10 Pro workstation and joins it to the domain
-    config.vm.define "workstation" do |workstation|
+    config.vm.define "workstation", after: "dc" do |workstation|
         # Assumes you have a Windows 10 vagrant box installed as 'Windows10Pro' 
         # You can build a Windows 10 box with packer from the Windows10 folder in this project
         # Add the box to vagrant with: `vagrant box add --name Windows10Pro ./path/to/box`
@@ -78,28 +80,4 @@ Vagrant.configure("2") do |config|
             vb.cpus = 2
         end
     end
-    
-
-    
-
-    # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
-    
-    # Create a private network, which allows host-only access to the machine
-    # using a specific IP.
-    # config.vm.network "private_network", ip: "192.168.33.10"
-    
-    # Create a public network, which generally matched to bridged network.
-    # Bridged networks make the machine appear as another physical device on
-    # your network.
-    # config.vm.network "public_network"
-    
-    # Share an additional folder to the guest VM. The first argument is
-    # the path on the host to the actual folder. The second argument is
-    # the path on the guest to mount the folder. And the optional third
-    # argument is a set of non-required options.
-    # config.vm.synced_folder "../data", "/vagrant_data"
-    
-    # VirtualBox specific settings
-    
-
 end

@@ -5,11 +5,9 @@ param (
 
 # Load the OU layout from the JSON template file
 $OUs = Get-Content -Path $OUTemplate -Raw | ConvertFrom-Json
-ForEach-Object $OUs | fl
-write-host $fqdn
 
 # Create the domain root OU
-New-ADOrganizationalUnit -Name $fqdn
+New-ADOrganizationalUnit -Name $fqdn 
 
 # Create the rest of the OU recursively
 function CreateOU($ou, $parentOUPath) {

@@ -4,6 +4,8 @@ Param(
     [string]$netbios,
     [string]$safemodepassword
 )
+# Disable powershell progress bar, WinSSH does not like it
+$ProgressPreference = "SilentlyContinue"
 
 # Set DNS server to ourselves
 Write-Host "Changing DNS to point to this server..."
